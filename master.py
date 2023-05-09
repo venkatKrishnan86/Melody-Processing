@@ -1,7 +1,8 @@
 import numpy as np
 import scipy.signal as sig
 import math
-eps = np.finfo(np.float).eps
+
+eps = np.finfo(np.float64).eps
 min_pitch = 60	#Hz, humanly not possible below this
 import sys, os
 import matplotlib.pyplot as plt
@@ -17,13 +18,13 @@ import transcription as ts
 import pitchPostProcess as PP
 import copy
 import pickle
-pwd = os.path.dirname(__file__)  
+pwd = os.path.dirname(__file__)  # Current directory
   
   
 def main(pwd):
   """
-  """  
-
+  """ 
+  # Write the 'fileList.txt', which contains the filename location of ALL the '.wav' files
   generate_file_list(pwd)
   batch_proc('fileList.txt')
   writeTranscriptionHz('fileList.txt')
@@ -32,12 +33,12 @@ def main(pwd):
 def batch_proc(fileList, pitchExt = '.pitch', tonicExt = '.tonic', transExt = '.transcription'):
   """
   """
-  lines = open(fileList,'r').readlines()
+  lines = open(fileList,'r').readlines() # The directory path
   
   for ii, line in enumerate(lines):
     
-    filename = line.strip()
-    print "Processing file: %s" %filename
+    filename = line.strip() # Removes \n and spaces
+    print("Processing file: %s" %filename)
     
     # Read pitch data
     #----------------
@@ -69,8 +70,10 @@ def batch_proc(fileList, pitchExt = '.pitch', tonicExt = '.tonic', transExt = '.
 
 def generate_file_list(rootDir):
   """
+    Writes the 'fileList.txt', which contains the path to the wav, pitch and tonic file
   """
-  fileList = BP.generateFileList((os.path.join(rootDir, 'data')), 'fileList.txt', ext = '.pitch')    
+  data_dir = os.path.join(rootDir, 'data') # Directory of 'data' folder
+  BP.generateFileList(data_dir, 'fileList.txt')    
   
   
 def findValidSvaras(filename,pitch,tonic):
@@ -81,7 +84,7 @@ def findValidSvaras(filename,pitch,tonic):
   phObj.ValidSwarLocEstimation()
   phObj.SwarLoc2Cents()
   svara = phObj.swarCents
-  print "Computing svara from histogram..."
+  print("Computing svara from histogram...")
   phObj.PlotSwarOnHistogram(filename,showOrSave=1)
   svaraSemitone = map(lambda svara:round(svara,-2),svara)
   octaveNotes = range(0,1101,100)
@@ -120,8 +123,7 @@ def get_quantized_ts(fileList, pitchExt = '.pitch'):
   
   song_str, st_seg, en_seg = readTransFile(fileList, transExt = '.transcription')
   
-  st, en = st_seg/Hop, en_seg/Hop
-  
+  st, en = np.array(st_seg/Hop).astype(int), np.array(en_seg/Hop).astype(int)
   qts = np.array([None]*(max(en)))
   for ii in range(len(st)):
     qts[st[ii]:en[ii]] = song_str[ii]

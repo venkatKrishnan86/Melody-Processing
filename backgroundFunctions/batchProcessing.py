@@ -485,9 +485,7 @@ def generateFileList(root_dir,fileOut,ext = '.wav'):
         # ext: Extension (e.g. .wav, .txt, etc.)
 
         # Pitch
-        melodia = Melodia(
-            voicingTolerance=1.4
-        )
+        melodia = Melodia()
         pitch_track = melodia.extract(f)
         np.savetxt(filename+'.pitch', pitch_track, delimiter='\t')
 

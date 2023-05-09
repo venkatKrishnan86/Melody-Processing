@@ -2,7 +2,7 @@
 import numpy as np
 
 
-eps = np.finfo(np.float).eps
+eps = np.finfo(np.float64).eps
 
 
 def readPitchFile(pitchfile):
@@ -33,7 +33,7 @@ def PitchHz2Cents(pitch, tonic, binPOctave=1200):
 def downsamplesPitchData(pCents,pHop,timeData, factor):
     
     if not np.round(factor)==factor:
-        print 'Please provide a integral factor for downsampling, later we might support fractional'
+        print('Please provide a integral factor for downsampling, later we might support fractional')
         return 0,0,0
     
     pHop = pHop*factor

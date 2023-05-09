@@ -27,10 +27,13 @@ except:
 sys.path.append(os.path.join(os.path.dirname(__file__), '../melodyProcessing/'))
 import pitchHistogram as PH
 
+from compiam.melody.pitch_extraction import Melodia
+from compiam.melody.tonic_identification import TonicIndianMultiPitch
+
 def packTimePitch(time, pitch):
     
     if time.size != pitch.size:
-        print "Please provide time and pitch arrays of the same length"
+        print("Please provide time and pitch arrays of the same length")
         return -1
     return np.vstack((time,pitch)).transpose()
 
@@ -38,41 +41,39 @@ def packTimePitch(time, pitch):
 
 
 def fineTuneTonicValue(tonicInFile, tonicOutFile, pitchFile):
-  #reading pitch
-  timePitch = np.loadtxt(pitchFile)
-  tonic = np.loadtxt(tonicInFile)
-  
-  phObj = PH.PitchHistogram(timePitch[:,1], tonic.tolist(), hResolution=1)
-  phObj.ComputePitchHistogram(Oct_fold=1)
-  phObj.SmoothPitchHistogram()
-  phObj.ValidSwarLocEstimation(Oct_fold=1)
-  phObj.SwarLoc2Cents()
-  phObj.ExtendSwarOctaves()
-  swars = phObj.swarCents
-  ind = np.argmin(abs(swars))
-  if abs(swars[ind]) < 100:
-    print "The tonic is off by %f cents"%swars[ind]
-    offset = swars[ind]
-    newTonic = tonic*np.power(2,offset/1200)
-    print "Old Tonic %f, New tonic %f\n"%(tonic, np.array([newTonic]))
-    np.savetxt(tonicOutFile, np.array([newTonic]))
-  
-def batchProcessTonicFineTune(root_dir, tonicExt = '.tonic', tonicExtOut = '.tonicFine', pitchExt = '.pitch'):
+    #reading pitch
+    timePitch = np.loadtxt(pitchFile)
+    tonic = np.loadtxt(tonicInFile)
     
+    phObj = PH.PitchHistogram(timePitch[:,1], tonic.tolist(), hResolution=1)
+    phObj.ComputePitchHistogram(Oct_fold=1)
+    phObj.SmoothPitchHistogram()
+    phObj.ValidSwarLocEstimation(Oct_fold=1)
+    phObj.SwarLoc2Cents()
+    phObj.ExtendSwarOctaves()
+    swars = phObj.swarCents
+    ind = np.argmin(abs(swars))
+    if abs(swars[ind]) < 100:
+        print("The tonic is off by %f cents"%swars[ind])
+        offset = swars[ind]
+        newTonic = tonic*np.power(2,offset/1200)
+        print("Old Tonic %f, New tonic %f\n"%(tonic, np.array([newTonic])))
+        np.savetxt(tonicOutFile, np.array([newTonic]))
+  
+def batchProcessTonicFineTune(root_dir, tonicExt = '.tonic', tonicExtOut = '.tonicFine', pitchExt = '.pitch'): 
     audiofilenames = GetFileNamesInDir(root_dir,tonicExt)
-
     for audiofilename in audiofilenames:
-      fname,ext = os.path.splitext(audiofilename)
-      try:     
- 	fineTuneTonicValue(fname+tonicExt, fname+tonicExtOut, fname+pitchExt)
-      except:
-	print fname
+        fname,ext = os.path.splitext(audiofilename)
+        try:     
+            fineTuneTonicValue(fname+tonicExt, fname+tonicExtOut, fname+pitchExt)
+        except:
+	        print(fname)
 
 def fetchMBID(mp3File):
     try:
         mbid = easyid3.ID3(mp3File)['UFID:http://musicbrainz.org'].data
     except:
-        print mp3File
+        print(mp3File)
         raise MBIDError('MBID not embedded')
     return mbid 
 
@@ -94,12 +95,12 @@ def computeDutationSongs(root_dir, FileExt2Proc='.mp3'):
         elif FileExt2Proc=='.wav':
             totalLen +=ES.MetadataReader(filename = audiofile)()[7]
             length.append(ES.MetadataReader(filename = audiofile)()[7]) 
-    print "total files %d\n"%len(audiofilenames)
-    print "Total length %d\n"%totalLen
-    print "Max length %d\n"%np.max(length)
-    print "Min length %d\n"%np.min(length)
-    print "Mean length %d\n"%np.mean(length)
-    print "median length %d\n"%np.median(length)
+    print("total files %d\n"%len(audiofilenames))
+    print("Total length %d\n"%totalLen)
+    print("Max length %d\n"%np.max(length))
+    print("Min length %d\n"%np.min(length))
+    print("Mean length %d\n"%np.mean(length))
+    print("median length %d\n"%np.median(length))
     
     return mbid_dur
                 
@@ -118,7 +119,7 @@ def BatchProcess_PitchExtraction(RootDir, FileExt2Proc = ".mp3", HopSize = 128, 
         
         if os.path.exists(outputfilename):
         
-            print "file "  + outputfilename + " already exists"
+            print("file "  + outputfilename + " already exists")
             
         else:
             
@@ -192,7 +193,7 @@ def BatchProcess_TonicIdentification(RootDir, tonicExt = '.tonic', FileExt2Proc 
         tonic = ES.TonicIndianArtMusic()(audio)
         
         MBID = audiofilename.split("/")[-1].strip()
-        print MBID
+        print(MBID)
         tonic_file.write(str(tonic)+"\n")
         tonic_file.close()
     
@@ -203,7 +204,7 @@ def BatchProcess_PitchSalienceExtraction(RootDir, FileExt2Proc = ".mp3", ExeFile
     audiofilenames = GetFileNamesInDir(RootDir, FileExt2Proc)
     
     for audiofilename in audiofilenames:
-        print "file being processed "+audiofilename
+        print("file being processed "+audiofilename)
         #Converting mp3 to wav
         
         wavfilename, ext = os.path.splitext(audiofilename) 
@@ -213,21 +214,21 @@ def BatchProcess_PitchSalienceExtraction(RootDir, FileExt2Proc = ".mp3", ExeFile
         ph_file_name = ph_file_name +".mph.txt"
         
         if os.path.exists(ph_file_name):
-            print "PH file already exist"
+            print("PH file already exist")
         else:
             cmd = "lame --decode "+ '"'+audiofilename+'"' + " " + '"'+wavfilename+'"'
             os.system(cmd)
             if os.path.exists(wavfilename):
-                if ExeFile is not -1:
+                if ExeFile != -1:
                     cmd =  ExeFile +" -m H -t I -i " + '"'+wavfilename +'"' + " -o "+ '"'+ph_file_name+'"'
-                    print cmd
+                    print(cmd)
                     os.system(cmd)
                 else:
-                    print "Please specify the binary file for execution"
+                    print("Please specify the binary file for execution")
             
                 os.remove(wavfilename)
             else:
-                print "Hey file " + audiofilename + " didn't produce any wave file"
+                print("Hey file " + audiofilename + " didn't produce any wave file")
                  
 def BatchProcess_Tonic_CCode(RootDir, FileExt2Proc = ".mp3", ExeFile= -1, outFileExt= ".tonic"):
 
@@ -235,7 +236,7 @@ def BatchProcess_Tonic_CCode(RootDir, FileExt2Proc = ".mp3", ExeFile= -1, outFil
     audiofilenames = GetFileNamesInDir(RootDir, FileExt2Proc)
 
     for audiofilename in audiofilenames:
-        print "file being processed "+audiofilename
+        print("file being processed "+audiofilename)
 
 
         filename, ext = os.path.splitext(audiofilename)
@@ -243,7 +244,7 @@ def BatchProcess_Tonic_CCode(RootDir, FileExt2Proc = ".mp3", ExeFile= -1, outFil
         wavfilename =  audiofilename
         
         if os.path.isfile(tonicfilename):
-            print "File already exist %s\n"%tonicfilename
+            print("File already exist %s\n"%tonicfilename)
             continue
 
         #Converting mp3 to wav if mp3 is to be processed\
@@ -253,18 +254,31 @@ def BatchProcess_Tonic_CCode(RootDir, FileExt2Proc = ".mp3", ExeFile= -1, outFil
             cmd = "lame --decode "+ '"'+audiofilename+'"' + " " + '"'+wavfilename+'"'
             os.system(cmd)
 
-        if ExeFile is not -1:
+        if ExeFile != -1:
             cmd =  ExeFile +" -m T -t V -i " + '"'+wavfilename +'"' + " -o "+ '"'+tonicfilename+'"'
-            print cmd
+            print(cmd)
             os.system(cmd)
         else:
-            print "Please specify the binary file for execution"
+            print("Please specify the binary file for execution")
 
 
         
-def GetFileNamesInDir(dir_name, filter=".wav"):
+def GetFileNamesInDir(dir_name, filter = ".wav"):
+    """
+        Returns the paths of all files ending with the 'filter' (.wav) in the entire directory as a list
+    """
     names = []
     for (path, dirs, files) in os.walk(dir_name):
+        # Iterates all the paths starting from the current directory in the first iteration
+        # dirs list down all the directories
+        # files list down all the files
+
+        # In the next iteration, the new path is to one of the directories in the current directory
+        # This repeats, and searches for the filter in the directory like a tree structure, where the 
+        # - Root is the current directory
+        # - The children of the root are the directories in the current directory and so on
+        # - The leaves are just files
+
         for f in files:
             #if filter in f.lower():
             if filter.split('.')[-1].lower() == f.split('.')[-1].lower():
@@ -281,7 +295,7 @@ def BatchPRocess_DeleteFiles(RootDir, FileExt2Proc = ".wav"):
     audiofilenames = GetFileNamesInDir(RootDir, FileExt2Proc)
     
     for audiofile in audiofilenames:
-        print "File removed " + audiofile
+        print("File removed " + audiofile)
         os.remove(audiofile)
     
     
@@ -299,9 +313,9 @@ def BatchPRocess_CheckDatabase(RootDir, FileExt2Proc = ".mp3"):
         phfile = phfile +".ph.txt"
         
         if not os.path.exists(phfile):
-            print "phfile " + phfile+ "does not exist"
+            print("phfile " + phfile+ "does not exist")
         if not os.path.exists(pitchfile):
-            print "pitchfile " + pitchfile + "does not exist"
+            print("pitchfile " + pitchfile + "does not exist")
         
 
 
@@ -425,9 +439,9 @@ def createValidityFiles(root_dir, searchExt, validFileList):
         if validityInfo[key]['done']==0:
             filesNoMp3.append(key)
     
-    print "total files generate %d" % (genCnt)
-    print "total files not generate %d" % (len(filesNotInList))
-    print "total mp3 files not found %d" % (len(filesNoMp3))
+    print("total files generate %d" % (genCnt))
+    print("total files not generate %d" % (len(filesNotInList)))
+    print("total mp3 files not found %d" % (len(filesNoMp3)))
     
 
 def testFileExist(fileList, Extension):
@@ -444,25 +458,42 @@ def testFileExist(fileList, Extension):
         if not os.path.isfile(fname):
             nonExist.append(fname)
             
-    print "total non existing files are %d"%(len(nonExist))
-    print nonExist
+    print("total non existing files are %d"%(len(nonExist)))
+    print(nonExist)
     
 def copyFileListForSearchingMotifs(root_dir, fileList, extOut, ext = '.wav'):
     
-    filenames = GetFileNamesInDir(root_dir, ext)
+    filenames = GetFileNamesInDir(root_dir, ext) # Obtain a list of paths to all files with .wav
     
     for f in filenames:
         filename, ext = os.path.splitext(f)
+        # filename: Path of name of file
+        # ext: Extension (e.g. .wav, .txt, etc.)
+
         filename = filename + extOut        
         shutil.copy(fileList, filename)
 
 def generateFileList(root_dir,fileOut,ext = '.wav'):
     
-    filenames = GetFileNamesInDir(root_dir, ext)
+    filenames = GetFileNamesInDir(root_dir, ext) # Obtain a list of paths to all files with .wav
     
-    fid = open(fileOut, "w")
-    for f in filenames:
+    fid = open(fileOut, "w") # In this case, it is a 'fileList.txt' in the current directory
+
+    for f in filenames: # Currently we only have one path to one .wav file - KA_Jaunpuri.wav
         filename, ext = os.path.splitext(f)
+        # filename: Path of name of file
+        # ext: Extension (e.g. .wav, .txt, etc.)
+
+        # Pitch
+        melodia = Melodia()
+        pitch_track = melodia.extract(f)
+        np.savetxt(filename+'.pitch', pitch_track, delimiter='\t')
+
+        # Tonic
+        tonic_identifier = TonicIndianMultiPitch()
+        tonic_value = tonic_identifier.extract(f)
+        np.savetxt(filename+'.tonic', [tonic_value])
+        
         fid.write("%s\n"%filename)
     
     fid.close()
@@ -472,7 +503,7 @@ def batchDeleteFiles(RootDir, delExts= [""]):
     for ext in delExts:
         filenames = GetFileNamesInDir(RootDir, ext)        
         for filename in filenames:
-            print "File removed " + filename
+            print("File removed " + filename)
             os.remove(filename)            
     
 def batchRenameFiles(RootDir, renExts= [{}]):            
@@ -563,7 +594,7 @@ def countNumberOfRemovedPatterns(root_dir, Ext):
         validPatterns = validPatterns + out.size - np.sum(out)
         
         
-    print "Total number of patterns are %d and total valid patterns are %d\n"%(totalPatterns, validPatterns)
+    print("Total number of patterns are %d and total valid patterns are %d\n"%(totalPatterns, validPatterns))
 
 
     
@@ -649,7 +680,7 @@ def batchProcessComputeLoudness(root_dir, searchExt = '.wav', outputExt='.loudne
     
     for filename in filenames:
       fname, ext = os.path.splitext(filename)
-      print "processing file: %s"%fname
+      print("processing file: %s"%fname)
       computeLoudness(filename, outputExt=outputExt, f0=fname+pitchExt, HopSize = HopSize, FrameSize = FrameSize, BinResolution = BinResolution, GuessUnvoiced=GuessUnvoiced, VoicingTolerance=VoicingTolerance, MaxFrequency=MaxFrequency, interpolateLoudness=interpolateLoudness, maxSilDurIntp=maxSilDurIntp, smoothLoudness=smoothLoudness)
       
     

@@ -1,6 +1,6 @@
 import numpy as np
 import scipy.signal as sig
-eps = np.finfo(np.float).eps
+eps = np.finfo(np.float64).eps
 import sys, os
 import matplotlib.pyplot as plt
 sys.path.append(os.path.join(os.path.dirname(__file__), '../batchProcessing'))
@@ -47,7 +47,7 @@ def resamplePitchSequence(pitch, upSampleFactor, silVal, tonic=-1, hopSize=-1):
       hopSize = timePitch[1,0]-timePitch[0,0]
     else:
       if type(hopSize)==int and hopSize ==-1:
-        print "Please provide a valid hopsize if you want to input pithc as a ndarray"
+        print("Please provide a valid hopsize if you want to input pithc as a ndarray")
         return -1
         
     if type(tonic)==str:
@@ -514,7 +514,7 @@ def postProcessPitchSequence(pitch, tonic=-1, hopSize=-1, filtDurMed=0.05, filtD
     tonic = float(tonic)
   
   if tonic >400 or tonic < 80:
-    print "You should provide a valid tonic value for this processing"
+    print("You should provide a valid tonic value for this processing")
   
   if upSampleFactor > 0 and upSampleFactor !=1:
     pitchResampled = resamplePitchSequence(pitch,  upSampleFactor, silVal, tonic = tonic, hopSize=hopSize)
@@ -554,7 +554,7 @@ def batchProcessPitchPostProcess(root_dir, searchExt = '.wav', pitchExt= '.tpe',
   """
   filenames = BP.GetFileNamesInDir(root_dir, searchExt)
   for filename in filenames:
-    print "Processing file %s"%filename
+    print("Processing file %s"%filename)
     fname, ext = os.path.splitext(filename)
     try:
         timePitch = np.loadtxt(fname+pitchExt)

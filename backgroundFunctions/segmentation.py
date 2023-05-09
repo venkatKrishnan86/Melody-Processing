@@ -8,7 +8,7 @@ import scipy.ndimage.filters as filters
 
 import pitchHistogram as PH
 
-eps = np.finfo(np.float).eps
+eps = np.finfo(np.float64).eps
 
 def groupIndices(indexes):
     """
@@ -45,7 +45,7 @@ class nyasSegmentation():
     swarCents = []
     
     def __init__(self):
-        print "Initialization PitchProcessing..."
+        print("Initialization PitchProcessing...")
         
     
     def ComputeNyasCandidates(self, pitch, tonic, phop, vicinityThsld = 30, timeAwayThsld = 100, varianceWinLen = 100, varianceThsld = 30):
@@ -97,7 +97,7 @@ class nyasSegmentation():
             else:
                 broad_tshld_hi = (self.swarCents[i+1]-self.swarCents[i])+50
                 broad_tshld_lo = (self.swarCents[i]-self.swarCents[i-1])+50
-                print swar, broad_tshld_hi, broad_tshld_lo
+                print(swar, broad_tshld_hi, broad_tshld_lo)
             # just to make process 249784fast lets find in one shot all the points which are atleast closer than narrow threshold
             ind_narrow = np.where((self.pCents<swar+narrow_tshld)&(self.pCents>swar-narrow_tshld))[0]
             self.nyasInfo[swar]=[]
@@ -181,7 +181,7 @@ class nyasSegmentation():
             del_ind = []
             for i, pair in enumerate(self.nyasInfo[swar][:-1]):
                 if((self.nyasInfo[swar][i+1][0]-self.nyasInfo[swar][i][1])<small_allowed_gap_samples):
-                    print "yes" + str(self.nyasInfo[swar][i])
+                    print("yes" + str(self.nyasInfo[swar][i]))
                     self.nyasInfo[swar][i][1]=self.nyasInfo[swar][i+1][1]
                     del_ind.append(i+1)
                 
@@ -231,8 +231,8 @@ class nyasSegmentation():
                     nyas_fill_info2[pair[0]]={'swar':swarNames[int(round(swar/100.0)%12)],'dur':pair}
                     n_nyas2 = n_nyas2 + 1
                 else:
-                    print "What the f is happening here!! at " + str(swar) + " " + str(pair[0])
-        print n_nyas1, n_nyas2
+                    print("What the f is happening here!! at " + str(swar) + " " + str(pair[0]))
+        print(n_nyas1, n_nyas2)
         
         #Combining information
         nyas_fill = [nyas_fill1, nyas_fill2]
@@ -387,7 +387,7 @@ class nyasSegmentation():
                 elif len(line[2]) ==1:
                     tg_dict['non-nyas'].append([float(line[0]), float(line[1]),line[2]])
                 elif len(line[2])!=0:
-                    print "we have got problem in ", line
+                    print("we have got problem in ", line)
 
         self.NyasAnnotations = tg_dict
 
@@ -506,7 +506,7 @@ class nyasSegmentation():
 
 class melodySegmentation():
     def __init__(self):
-        print 'Initializing melodySegmentation class'
+        print('Initializing melodySegmentation class')
         
     def ExtractBreathPhrases(self, pCents, phop, valid_pause_dur):
         """This function output breath phrases
@@ -685,7 +685,7 @@ class melodySegmentation():
             elif np.mean(decArray[seg[0]:seg[1]+1,1])==-1:
                 decArray[seg[0]:seg[1]+1,1] = ii
             else:
-                print "I never expected this to happen check around segment index %d"%seg[0]
+                print("I never expected this to happen check around segment index %d"%seg[0])
 
         finalDecArray = -1*np.ones(length)
 
@@ -712,12 +712,12 @@ class melodySegmentation():
         diff = segmentsOutSort[1:,1]-segmentsOutSort[:-1,1]
         indNeg = np.where(diff<0)[0] +1
         if len(indNeg)>0:
-            print "We still get overlapping segments, something is wrong"
-            print segmentsOutSort[indNeg[0]-2,:]
-            print segmentsOutSort[indNeg[0]-1,:]
-            print segmentsOutSort[indNeg[0],:]
-            print segmentsOutSort[indNeg[0]+1,:]
-            print segmentsOutSort[indNeg[0]+2,:]
+            print("We still get overlapping segments, something is wrong")
+            print(segmentsOutSort[indNeg[0]-2,:])
+            print(segmentsOutSort[indNeg[0]-1,:])
+            print(segmentsOutSort[indNeg[0],:])
+            print(segmentsOutSort[indNeg[0]+1,:])
+            print(segmentsOutSort[indNeg[0]+2,:])
             
         else:
             return segmentsOutSort

@@ -52,17 +52,17 @@ class PitchHistogram():
             if len(pitch)>0:
                 self.pitch = pitch
             else:
-                print "Specify valid pitch data"
+                print("Specify valid pitch data")
         except:
-            print "Provide valid pitch data as an array of pitch sequence"
+            print("Provide valid pitch data as an array of pitch sequence")
         
         try:
             if type(tonic) == int or type(tonic) == float:
                 self.tonic = tonic
             else:
-                print "Specify valid tonic value"
+                print("Specify valid tonic value")
         except:
-            print "Provide valid tonic value"
+            print("Provide valid tonic value")
         
         
     def setPitch(self, pitch):
@@ -85,7 +85,7 @@ class PitchHistogram():
         
         variance = float(Variance)/self.hResolution  #variance of the normal distribution, in bins
         wind_range = (np.array([-50, 50])/self.hResolution) # from index corresponding to -50 to 50 cents
-        norm_win = sps.norm(0, variance).pdf(np.linspace(wind_range[0],wind_range[1],num=1+wind_range[1]-wind_range[0]))
+        norm_win = sps.norm(0, variance).pdf(np.linspace(wind_range[0],wind_range[1],num=int(1+wind_range[1]-wind_range[0])))
         norm_win = norm_win/sum(norm_win)
         
         #convolving histogram withh  this window
@@ -124,20 +124,20 @@ class PitchHistogram():
         if type(pitch) != int:
             self.setPitch(pitch)        
         elif type(self.pitch)==int:
-            print "Please provide a pitch file name, it was not provided during initialization"
+            print("Please provide a pitch file name, it was not provided during initialization")
             return -1
 
         if tonic!=-1:
             self.setTonic(tonic)
         elif self.tonic==-1:
-            print "Please provide tonic information, it was not provided during initialization"
+            print("Please provide tonic information, it was not provided during initialization")
             return -1
     
         if type(timeStamps) != int:
             self.setTimeStamps(timeStamps)
         
         if (tRange!=-1) and (type(self.timeStamps)==int):
-            print "For this option of using tRange for histogram computation, timeStamps information should also be provided"
+            print("For this option of using tRange for histogram computation, timeStamps information should also be provided")
             return -1
         
     
@@ -204,7 +204,7 @@ class PitchHistogram():
             if (len(self.hist_Yval)>0):
                 histogram = self.hist_Yval
             else:            
-                print "Please initialize class instance with pitch, tonic or setPitch and setTonic appropriately"
+                print("Please initialize class instance with pitch, tonic or setPitch and setTonic appropriately")
                 return -1
     
         #finding peaks and valleys
@@ -217,15 +217,15 @@ class PitchHistogram():
         peak_ind = np.sort(peak_ind)
         valley_ind = np.sort(valley_ind)
 
-        ind_str = np.where(peak_valley==peak_ind[0])[0]
-        print ind_str
+        ind_str = np.where(peak_valley==peak_ind[0])[0][0]
+        print(ind_str)
         if(ind_str==0):
             ind_min = np.argmin(histogram[0:peak_valley[ind_str]])
             peak_valley = np.append(ind_min,peak_valley)
         else:
             ind_str = ind_str-1
 
-        ind_end = np.where(peak_valley==peak_ind[-1])[0]
+        ind_end = np.where(peak_valley==peak_ind[-1])[0][0]
         if ind_end == len(peak_valley)-1:
             ind_min = peak_valley[ind_end] + np.argmin(histogram[peak_valley[ind_end]:])
             peak_valley = np.append(peak_valley,ind_min)
@@ -285,8 +285,8 @@ class PitchHistogram():
             
     def PlotSwarOnHistogram(self, filename, showOrSave=0):
         if((len(self.hist_Yval)>0)&(len(self.swarLocs)>0)):
-            fig = plt.figure()
-            plt.hold('True')
+            fig, ax = plt.subplots(1, 1)
+            # plt.hold('True')
             plt.plot(self.hist_Xval, self.hist_Yval, 'k')
             plt.plot(self.hist_Xval[self.swarLocs], self.hist_Yval[self.swarLocs],'ro')
             
@@ -296,12 +296,12 @@ class PitchHistogram():
                 plt.xlabel("Pitch (cents) as solfege", fontsize=fsize, fontname="Times New Roman")
                 plt.xlim([-100, 1200])
                 plt.ylim([0, 1.1])
-                ax = plt.axes()
-                ax.set_aspect(500)
+                # ax = plt.axes()
+                # ax.set_aspect(500)
                 major_ticks = np.arange(-100, 1201, 100)
                 ax.set_xticks(major_ticks)
                 ax.set_xticklabels(['','S','r','R','g','G','m','M','P','d','D','n','N',''])
-                plt.grid(b=True,axis='x')
+                plt.grid(visible=True,axis='x')
                 #plt.show()
                 histogramFilename = (''.join([filename,'_histogram.pdf']))
                 fig.savefig(histogramFilename)
@@ -309,5 +309,5 @@ class PitchHistogram():
                 plt.show()
             
         else:
-            print "Either histogram is not computed or swar locations are not obtained!! take care!! "  
+            print("Either histogram is not computed or swar locations are not obtained!! take care!!")
         

@@ -43,9 +43,8 @@ class SvarTranscription:
     
     def get_timeSeries(self):
         st, en = self.start, self.end
-        print "Getting time series..."
-        nSamp = np.ceil(en/float(self.pdata[2]))
-        #print nSamp
+        print("Getting time series...")
+        nSamp = int(np.ceil(en/float(self.pdata[2])))
         t, s = self.pdata[0][:nSamp], self.pdata[1][:nSamp]
         return t, s
         
@@ -55,7 +54,7 @@ class SvarTranscription:
         if np.isnan(val):
             return None
         if verbose and (val < LEVELS[0] or val > LEVELS[-1]) :
-            print 'Warning: Time series value %f out of quantization range' % (val,)
+            print('Warning: Time series value %f out of quantization range' % (val,))
         ind = [l for l in LEVELS if abs(l-val) < width]
         if len(ind) == 0:
             return NULL_TOKEN
@@ -74,8 +73,8 @@ class SvarTranscription:
         time series corresponding to beginning of clipped song  
         instead of absolute time in seconds
         '''
-        print "Transcribing melody..."
-        symbs = map(lambda x:self._quantize(x,self.ignore, width, verbose), self.ts)
+        print("Transcribing melody...")
+        symbs = list(map(lambda x:self._quantize(x,self.ignore, width, verbose), self.ts))
         t_st, t_en = [0], []
         prev, count = symbs[0], 0
         symbols = []
@@ -105,7 +104,7 @@ class SvarTranscription:
                 t_en[index] = t_en[i]
                 index += 1                   
             elif t_st[i] - t_en[index-1] > 120:
-	        prev = s
+                prev = s
                 symbols[index] = s
                 t_st[index] = t_st[i]
                 t_en[index] = t_en[i]
@@ -169,7 +168,7 @@ class SvarTranscription:
     @staticmethod
     def convert_to_levels(string):
         level = []
-        for i in xrange(len(string)):
+        for i in range(len(string)):
             level.append(LEVELS[CODES.index(string[i])])
         return level    
     

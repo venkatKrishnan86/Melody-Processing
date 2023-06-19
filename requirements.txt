@@ -13,3 +13,4 @@ compiam==0.2.1
 mutagen==1.46.0
 scikit-learn>=0.24.2
 essentia
+pydub

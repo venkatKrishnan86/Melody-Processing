@@ -5,7 +5,6 @@ Date: June 13th, 2016
 Contact: +919769753366
 ==============================
 
-
 -----------------------------------------------------------------------------------------------------------------------
 For visualizing the melodic contour and the automatically extracted sargam notation, please follow the following steps:
 -----------------------------------------------------------------------------------------------------------------------
@@ -28,3 +27,9 @@ To extract the same information for an unknown song, please follow the following
 6) Open terminal and navigate to the directory where you have unzipped this package (the folder where master.py is located). Type "python master.py" without quotes and press 'Enter'. This will run the analyses for all artists at one go, hence you are requested to add as many artists you want as per guidelines above and run the code only once, at the very end.
 7) This will generate the transcription (.transcription_Hz) file within each album, you can further observe them on Sonic Visualizer.
 8) This will also generate the pitch histogram (<filename>_histogram.pdf) file which you can make inference from. E.g., you will see that the spread of each peak (corresponding to a note) is different. In KA_Bhoop you can observe the peak location of 'G' is lower than the equi-tempered grid (400 cents) and the valley for 'M' is not as deep as one would expect for a non-raga note. These explains the average intonation of 'G' and presence of 'M' touch note by the artist. You can make many interesting observations from the histogram specially if you have pieces of allied ragas, say you can compare Bhoop-Deshkar-SudhKalyan or Puriya-Marwa-Sohini etc.
+
+
+-------------------------------------------------------------------------------------------
+Improvement in Automation done by - Venkatakrishnan V K
+1. Eliminated requirement of inputting '.pitch' and '.tonic' files (Automatically calculates internally in the code)
+2. Simplified the whole process to running two blocks in: https://colab.research.google.com/drive/1mpEfOCgt_0m5T2jNEfGIPWkrPKsqxNbm#scrollTo=FNItTLflYBXG

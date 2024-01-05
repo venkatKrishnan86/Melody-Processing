@@ -13,4 +13,4 @@ six==1.16.0
 subprocess32==3.5.4
 mutagen==1.46.0
 scikit-learn>=0.24.2
-compiam
+compiam==0.3.0
